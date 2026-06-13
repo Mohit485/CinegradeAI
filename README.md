@@ -1,151 +1,90 @@
-# 🎬 CineGrade AI
+# CINEGRADEAI : AI Video Scene Analyzer & Color Grader
 
-### AI-powered video scene analysis and color grading pipeline
+An end-to-end AI pipeline that analyzes video cinematography scene by scene using **Gemini 2.5 Flash**, applies intelligent **color grading** based on the analysis, and exports a before/after comparison video with a PDF report.
 
-> Upload any video. CineGrade AI detects every scene cut, analyzes the cinematography of each shot using Gemini Vision, and automatically applies professional color grading — brightness, contrast, saturation, color temperature, and LUT — scene by scene.
-
-![Banner](assets/banner.png)
-
+Built as a portfolio project targeting Generative AI Engineer roles in creative and media production.
 
 ---
 
-## ✨ What It Does
-
-- 🎞️ Detects every shot cut in a video automatically using **PySceneDetect**
-- 🖼️ Extracts one representative keyframe per scene
-- 🤖 Sends each keyframe to **Gemini 2.5 Flash Vision** for cinematographic analysis — lighting quality, mood, composition, exposure issues
-- 📋 Receives structured grading instructions back as JSON — brightness, contrast, saturation, color temperature, LUT selection
-- 🎨 Applies all adjustments **frame by frame** using OpenCV with a full float32 pipeline to prevent flickering
-- 🎞️ Applies one of **13 professional `.cube` LUT files** chosen by the AI based on scene mood
-- 📄 Exports a **color graded video** and a **PDF report** with keyframe images and director's notes per scene
-
----
-
-## 🎥 Demo
-
-| Original Frame | AI Graded Frame |
-|---|---|
-| ![Before](assets/before.png) | ![After](assets/after.png) |
-
-> Scene analysis table printed in terminal during pipeline run:
-
-![Pipeline Terminal](assets/pipeline.png)
-
-> Gradio web interface:
-
-![Gradio UI](assets/gradio_ui.png)
-
----
-
-## 🔁 Pipeline
+## 🧠 How It Works
 
 ```
 Video input
-    │
-    ▼
-Scene boundary detection      ←  PySceneDetect (finds every cut point)
-    │
-    ▼
-Keyframe extraction            ←  OpenCV (1 frame per scene)
-    │
-    ▼
-Cinematography analysis        ←  Gemini 2.5 Flash Vision (returns JSON)
-    │
-    ▼
-Color grading per scene        ←  OpenCV float32 + .cube LUT
-    │
-    ▼
-PDF report generation          ←  fpdf2 (keyframes + director notes)
-    │
-    ▼
-Graded video export            ←  OpenCV VideoWriter
+  → Scene boundary detection       (PySceneDetect)
+  → Keyframe extraction            (OpenCV)
+  → Cinematography analysis        (Gemini 2.5 Flash Vision)
+  → Color grading per scene        (OpenCV + LUT files)
+  → PDF report generation          (fpdf2)
+  → Graded video export            (FFmpeg / OpenCV VideoWriter)
 ```
+
+Each scene is analyzed independently. Gemini returns structured JSON with brightness, contrast, saturation, color temperature, and LUT recommendations. These values are applied mathematically to every frame in that scene.
 
 ---
 
 ## 🛠️ Tech Stack
 
-| Component | Tool |
-|---|---|
-| Vision + language analysis | Google Gemini 2.5 Flash (`google-genai`) |
-| Scene detection | PySceneDetect |
-| Image and video processing | OpenCV, NumPy |
-| Color grading | OpenCV float32 pipeline + `.cube` LUTs |
-| PDF report | fpdf2 |
-| Web interface | Gradio |
+- **Gemini 2.5 Flash** — multimodal vision analysis (free tier)
+- **PySceneDetect** — automatic scene boundary detection
+- **OpenCV** — frame extraction, color math, video I/O
+- **LUT (.cube files)** — professional cinematic color grades
+- **fpdf2** — PDF report generation
+- **Gradio** — optional web interface
 
 ---
 
 ## 📁 Project Structure
 
 ```
-CineGrade-AI/
-│
-├── main.py                  # pipeline coordinator — run this
-├── scene_detector.py        # finds scene cuts, extracts keyframes
-├── frame_analyzer.py        # sends frames to Gemini, parses JSON response
-├── color_grader.py          # applies brightness/contrast/saturation/LUT per scene
-├── report_generator.py      # builds the PDF report
-├── app.py                   # Gradio web interface
-│
-├── lut/                     # 13 professional .cube LUT files
-│   ├── magic_hour.cube
-│   ├── dark_somber.cube
-│   ├── orange_and_blue.cube
-│   └── ...
-│
-├── assets/                  # images used in this README
-│   ├── banner.png
-│   ├── before.png
-│   ├── after.png
-│   ├── pipeline.png
-│   └── gradio_ui.png
-│
-└── requirements.txt
+video_analyzer/
+├── main.py                   # pipeline coordinator
+├── scene_detector.py         # scene detection + keyframe extraction
+├── frame_analyzer.py         # Gemini API calls + JSON parsing
+├── color_grader.py           # color grading + LUT application
+├── report_generator.py       # PDF report generation
+├── app.py                    # Gradio web UI (optional)
+├── requirements.txt
+└── lut/                      # place your .cube LUT files here
+    ├── magic_hour.cube
+    ├── dark_somber.cube
+    └── ...
 ```
 
 ---
 
 ## ⚙️ Setup
 
-### 1. Clone the repository
-
-```bash
-git clone https://github.com/Mohit485/CineGrade-AI.git
-cd CineGrade-AI
-```
-
-### 2. Install dependencies
-
+**1. Install dependencies**
 ```bash
 pip install -r requirements.txt
 ```
 
-### 3. Get a free Gemini API key
+**2. Get a free Gemini API key**
 
-Go to [aistudio.google.com](https://aistudio.google.com) → click **Get API key** → free, no credit card needed.
+Go to [aistudio.google.com](https://aistudio.google.com) → Get API key (no credit card required)
 
-Then set it in your terminal:
-
+**3. Set your API key**
 ```bash
-# Mac / Linux
+# macOS / Linux
 export GOOGLE_API_KEY="your_key_here"
 
 # Windows
 set GOOGLE_API_KEY=your_key_here
 ```
 
-### 4. Add your LUT files
+**4. Add your LUT files**
 
-Place your `.cube` files inside the `lut/` folder. The pipeline expects these 13 files:
+Place your `.cube` LUT files inside the `lut/` folder. The project expects these 13 files:
 
 ```
-dark_somber.cube         hard_boost.cube          long_beach_morning.cube
-lush_green.cube          magic_hour.cube          natural_boost.cube
-orange_and_blue.cube     soft_bw.cube             waves.cube
-blue_architecture.cube   blue_hour.cube           cold_chrome.cube
+dark_somber.cube        hard_boost.cube         long_beach_morning.cube
+lush_green.cube         magic_hour.cube         natural_boost.cube
+orange_and_blue.cube    soft_bw.cube            waves.cube
+blue_architecture.cube  blue_hour.cube          cold_chrome.cube
 crisp_autumn.cube
 ```
+
+Free `.cube` LUT packs are widely available — search "free cinematic LUT pack .cube download".
 
 ---
 
@@ -177,16 +116,130 @@ Open `http://localhost:7860` in your browser. Upload a video, click **Analyze & 
 
 ---
 
-## 🎨 How the Color Grading Works
+## 🎛️ Tuning Settings for Different Videos
 
-Gemini Vision analyzes each keyframe and returns a structured JSON object like this:
+There is no single setting that works perfectly for every video. Different content requires different tuning. Here is what to adjust and when.
 
+### Scene Detection Threshold — `scene_detector.py`
+
+```python
+ContentDetector(threshold=27)   # line 24 in scene_detector.py
+```
+
+| Video Type | Recommended Threshold |
+|---|---|
+| Personal raw footage, mixed scenes | `25 – 30` |
+| Nature documentary, slow cuts | `20 – 25` |
+| Music video, fast cuts | `30 – 35` |
+| CGI / animation / movie (Avatar etc.) | `40 – 50` |
+
+**Lower threshold** = more sensitive = detects more (possibly false) cuts  
+**Higher threshold** = less sensitive = only detects hard, obvious cuts
+
+If you are getting too many scenes detected on a single continuous shot, raise the threshold. If cuts are being missed, lower it.
+
+### LUT Blend Strength — `color_grader.py`
+
+```python
+apply_lut2frame(graded, lut_array, strength=0.6)   # line ~136 in color_grader.py
+```
+
+| Video Type | Recommended Strength |
+|---|---|
+| Personal raw / flat footage | `0.6 – 0.7` |
+| Mixed personal clips | `0.5 – 0.6` |
+| Already color graded footage (films, music videos) | `0.3 – 0.4` |
+| CGI / animation | `0.25 – 0.35` |
+
+**Why this matters:** Films like Avatar are professionally color graded before you receive them. Applying a full-strength LUT on top of existing grading stacks two grades together and produces heavy color casts (usually blue or teal). Reducing strength to `0.3–0.4` blends the LUT subtly without overriding the original grade.
+
+### Color Temperature Multipliers — `color_grader.py`
+
+```python
+result[:, :, 2] *= 1.08   # Red channel (warm)
+result[:, :, 0] *= 0.92   # Blue channel (warm)
+```
+
+| Video Type | Recommended Multiplier |
+|---|---|
+| Personal raw footage | `1.08 / 0.92` (current default) |
+| Movie / pre-graded footage | `1.04 / 0.96` (subtle) |
+| Animation / CGI | `1.03 / 0.97` (very subtle) |
+
+### Quick Reference — Settings by Video Type
+
+| Video Type | Threshold | LUT Strength | Temp Multiplier |
+|---|---|---|---|
+| Personal raw clip | `27` | `0.65` | `1.08 / 0.92` |
+| Nature documentary | `25` | `0.65` | `1.08 / 0.92` |
+| Music video | `30` | `0.50` | `1.06 / 0.94` |
+| Pre-graded film clip | `45` | `0.35` | `1.04 / 0.96` |
+| CGI / animation | `50` | `0.30` | `1.03 / 0.97` |
+
+> **Best results:** Use your own raw or lightly processed footage. The pipeline is designed for flat/raw video that benefits from AI-driven grading. Pre-graded Hollywood films are already professionally color corrected and will show aggressive or unnatural results at default settings.
+
+---
+
+## ⚠️ Known Limitations
+
+### Speed
+
+Processing is CPU-bound. Every single frame of the video passes through multiple OpenCV operations (brightness/contrast, saturation conversion, color temperature, LUT lookup). A 2-minute video at 30fps = 3,600 frames processed individually.
+
+**Approximate processing times on a mid-range CPU:**
+
+| Video Length | Scenes | Approx. Time |
+|---|---|---|
+| 30 seconds | 5 – 8 | 2 – 4 min |
+| 2 minutes | 15 – 25 | 8 – 15 min |
+| 5 minutes | 30 – 50 | 20 – 35 min |
+
+This is a known limitation of CPU-based per-frame processing. A GPU-accelerated pipeline (CUDA OpenCV) would be significantly faster but requires additional setup. For portfolio demonstration purposes, short clips of 30–60 seconds are recommended.
+
+### Gemini Free Tier Quota
+
+Gemini 2.5 Flash free tier allows approximately **25 requests per day (RPD)**. Each scene = 1 API request. A video with 25 scenes will exhaust the daily quota in a single run. The quota resets every 24 hours.
+
+**Workaround:** Use shorter videos (under 60 seconds) with fewer scenes for demos, or use a video with slow cuts so fewer scenes are detected.
+
+### Temporal Consistency
+
+Gemini analyzes each keyframe **independently** with no memory of surrounding scenes. It does not know what the previous or next scene looked like. This means:
+
+- Two visually similar scenes may receive different grading suggestions
+- Scene-to-scene grading transitions can feel inconsistent on long videos
+- Videos shot in a single location with consistent lighting will show the most noticeable inconsistency
+
+A 15-frame transition blend is applied at scene boundaries to smooth hard jumps, but underlying suggestion inconsistency from the model cannot be fully corrected at the grading stage.
+
+### Pre-Graded Film Footage
+
+The pipeline is designed for **raw or lightly processed footage**. Professionally color graded films (theatrical releases, music videos, CGI animations) already have a deliberate color grade applied. Running this pipeline on pre-graded footage stacks a second grade on top, often producing heavy color casts. Reduce LUT strength to `0.3` and temperature multipliers to `1.03/0.97` for such content.
+
+### Single-Shot Videos
+
+PySceneDetect requires at least one detectable cut in the video. If the video is a single uncut shot with no camera cuts, the pipeline will detect zero scenes and exit early. Minimum recommended: 2 or more distinct shots.
+
+### Audio
+
+The graded output video has no audio. The pipeline uses OpenCV VideoWriter which does not carry audio tracks. If audio is needed, re-add it manually using FFmpeg after grading:
+
+```bash
+ffmpeg -i output/graded_video.mp4 -i your_original_video.mp4 -c copy -map 0:v:0 -map 1:a:0 output/graded_with_audio.mp4
+```
+
+---
+
+## 📊 Example Output
+
+**JSON analysis per scene (`analysis_data.json`):**
 ```json
 {
-  "scene_description": "Golden hour exterior shot of a narrow street",
+  "scene_number": 3,
   "mood": "warm",
-  "issues": ["slightly underexposed", "low saturation"],
-  "director_note": "Boost warmth and exposure to bring out the golden feel of the light.",
+  "scene_description": "Golden hour exterior shot of a street with long shadows",
+  "director_note": "Boost warmth to enhance the golden feel of the shot",
+  "issues": ["slightly underexposed", "low contrast"],
   "adjustments": {
     "brightness": 20,
     "contrast": 15,
@@ -197,62 +250,8 @@ Gemini Vision analyzes each keyframe and returns a structured JSON object like t
 }
 ```
 
-These values drive OpenCV math applied to every pixel in that scene:
-
-| Adjustment | What it does |
-|---|---|
-| `brightness` | Adds a constant offset to every pixel value |
-| `contrast` | Scales pixel values around midpoint 128 — darks darker, brights brighter |
-| `saturation` | Converts to HSV, scales the S channel, converts back |
-| `color_temp` | Scales R and B channels individually — warm = more red, less blue |
-| `lut` | Applies a 3D `.cube` lookup table for the final cinematic film look |
-
-> **Why float32?** The entire grading pipeline runs in float32 and converts back to uint8 only once at the final step. Converting between int and float repeatedly at each adjustment step causes tiny rounding errors that accumulate differently across frames, producing visible flickering. Float32 throughout eliminates this completely.
-
----
-
-## 🎞️ LUT Library
-
-| LUT | Best suited for |
-|---|---|
-| `magic_hour` | Golden hour, sunset, sunrise |
-| `dark_somber` | Moody, noir, dark dramatic scenes |
-| `hard_boost` | High contrast action and dramatic shots |
-| `long_beach_morning` | Soft hazy morning light |
-| `lush_green` | Nature, forests, greenery |
-| `natural_boost` | General natural daylight |
-| `orange_and_blue` | Cinematic blockbuster look |
-| `soft_bw` | Emotional, minimalist, black and white feel |
-| `waves` | Ocean, water, coastal scenes |
-| `blue_architecture` | Urban, buildings, city environments |
-| `blue_hour` | Dusk, twilight, blue tones |
-| `cold_chrome` | Futuristic, sterile, cold environments |
-| `crisp_autumn` | Fall colors, warm earth tones |
-
----
-
-## ⚠️ Limitations
-
-- Gemini 2.5 Flash free tier allows approximately **25 requests per day** — suitable for short clips up to ~25 scenes per day
-- **Audio is not preserved** in the output video — can be remuxed manually using FFmpeg if needed:
-  ```bash
-  ffmpeg -i graded_video.mp4 -i original.mp4 -c copy -map 0:v -map 1:a final.mp4
-  ```
-- LUT files are **not included** in this repo due to licensing — source free `.cube` LUTs from [IWLTBAP](https://iwltbap.com) or similar
-
----
-
-## 👤 Author
-
-**Mohit**
-Final year B.Tech — Artificial Intelligence & Machine Learning
-JB Institute of Technology, Dehradun
-
-[![GitHub](https://img.shields.io/badge/GitHub-Mohit485-black?style=flat-square&logo=github)](https://github.com/Mohit485)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue?style=flat-square&logo=linkedin)](https://linkedin.com/in/YOUR_PROFILE)
-
 ---
 
 ## 📄 License
 
-This project is licensed under the MIT License — feel free to use, modify, and distribute.
+MIT License — free to use, modify, and distribute.

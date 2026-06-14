@@ -117,6 +117,30 @@ python app.py
 
 Open `http://localhost:7860` in your browser. Upload a video, click **Analyze & Grade Video**, and see the original and graded video side by side with the full analysis.
 
+![Gradio Interface](ss/cinegrade_app.png)
+---
+
+## 📊 Example Output
+
+**JSON analysis per scene (`analysis_data.json`):**
+```json
+{
+  "scene_number": 3,
+  "mood": "warm",
+  "scene_description": "Golden hour exterior shot of a street with long shadows",
+  "director_note": "Boost warmth to enhance the golden feel of the shot",
+  "issues": ["slightly underexposed", "low contrast"],
+  "adjustments": {
+    "brightness": 20,
+    "contrast": 15,
+    "saturation": 1.3,
+    "color_temp": "warm",
+    "lut": "magic_hour"
+  }
+}
+```
+
+---
 ---
 
 ## 🎛️ Tuning Settings for Different Videos
@@ -231,29 +255,7 @@ The graded output video has no audio. The pipeline uses OpenCV VideoWriter which
 ffmpeg -i output/graded_video.mp4 -i your_original_video.mp4 -c copy -map 0:v:0 -map 1:a:0 output/graded_with_audio.mp4
 ```
 
----
 
-## 📊 Example Output
-
-**JSON analysis per scene (`analysis_data.json`):**
-```json
-{
-  "scene_number": 3,
-  "mood": "warm",
-  "scene_description": "Golden hour exterior shot of a street with long shadows",
-  "director_note": "Boost warmth to enhance the golden feel of the shot",
-  "issues": ["slightly underexposed", "low contrast"],
-  "adjustments": {
-    "brightness": 20,
-    "contrast": 15,
-    "saturation": 1.3,
-    "color_temp": "warm",
-    "lut": "magic_hour"
-  }
-}
-```
-
----
 
 ## 📄 License
 

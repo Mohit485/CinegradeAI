@@ -5,7 +5,7 @@ An end-to-end AI pipeline that analyzes video cinematography scene by scene usin
 Built as a portfolio project targeting Generative AI Engineer roles in creative and media production.
 
 
-![Gradio Interface](ss/lt_30 cinegrade.gif)
+![Gradio Interface](ss/lt_30.gif)
 
 ---
 

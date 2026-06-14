@@ -8,7 +8,7 @@ def find_scenes(video_path):
     scene_manager= SceneManager()
     # ContentDetector is the actual algorithm doing the work.
     # threshold=27 means: if two frames differ by more than 40 (on a 0-255 scale), we will call it a cut
-    scene_manager.add_detector(ContentDetector(threshold= 40))
+    scene_manager.add_detector(ContentDetector(threshold= 45))
     scene_manager.detect_scenes(video)
     # get_scene_list() gives us a list of (start_time, end_time) pairs
     # e.g. [(00:00:00, 00:00:03), (00:00:03, 00:00:07), ...]

@@ -5,7 +5,13 @@ An end-to-end AI pipeline that analyzes video cinematography scene by scene usin
 Built as a portfolio project targeting Generative AI Engineer roles in creative and media production.
 
 
-![Gradio Interface](ss/lt_30.gif)
+<div align="center">
+  <img src="ss/lt_30.gif" alt="3D-FY Demo Preview" width="75%">
+</div>
+
+<div align="center">
+  <img src="ss/repo.gif" alt="3D-FY Demo Preview" width="75%">
+</div>
 
 ---
 
